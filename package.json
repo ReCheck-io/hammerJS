@@ -1,0 +1,27 @@
+{
+  "name": "recheck-hammerjs",
+  "version": "1.0.0",
+  "description": "A CLI program that utilizes ReCheck encryption library ",
+  "main": "hammer.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReCheck-io/hammerJS.git"
+  },
+  "keywords": [
+    "encryption",
+    "cli",
+    "blockchain"
+  ],
+  "author": "ReCheck team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ReCheck-io/hammerJS/issues"
+  },
+  "homepage": "https://github.com/ReCheck-io/hammerJS#readme",
+  "dependencies": {
+    "recheck-clientjs-library": "^1.0.2"
+  }
+}
