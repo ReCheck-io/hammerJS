@@ -1,0 +1,14 @@
+{
+    "docs": [
+        {
+            "location": "/",
+            "text": "hammerJS\n\n\nA Command line tool (CLI) that utilizes recheck-clientjs-library. You can connect and do various things on a blockchain. \n\n\n\n\nhammer -i \n store \n\n\nhammer -i \n share \n \n\n\nhammer -i \n open \n\n\nhammer -i \n select -t [open|share] \n \n\n\nhammer -i \n selection \n\n\nhammer -i \n exec \n\n\nhammer -i \n login [\n]\n\n\nhammer -i \n receipt \n\n\nhammer verify \n\n\nhammer signup -o \n\n\nhammer new -o \n\n\nhammer import -o \n -p",
+            "title": "Home"
+        },
+        {
+            "location": "/#hammerjs",
+            "text": "A Command line tool (CLI) that utilizes recheck-clientjs-library. You can connect and do various things on a blockchain.    hammer -i   store   hammer -i   share     hammer -i   open   hammer -i   select -t [open|share]     hammer -i   selection   hammer -i   exec   hammer -i   login [ ]  hammer -i   receipt   hammer verify   hammer signup -o   hammer new -o   hammer import -o   -p",
+            "title": "hammerJS"
+        }
+    ]
+}
