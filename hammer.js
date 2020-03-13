@@ -119,7 +119,7 @@ program
     .action(async function (identityName, cmdObj) {
         try {
             if (!cmdObj.encryptPass) {
-                console.error("Password is required. Please specify with -p option");
+                console.error("Encryption password is required. Please specify with -e option");
                 process.exit(1);
             }
             let newAccount = await recheck.newKeyPair(null);
