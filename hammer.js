@@ -1,20 +1,38 @@
 #!/usr/bin/env node
 
+const recheck = require('./recheck-client');
+
 const program = require('commander');
 const fs = require('fs');
 const path = require('path');
 const aes256 = require('aes256');
-const recheck = require('recheck-clientjs-library');
 const btoa = require('btoa');
 const atob = require('atob');
 
-let _network = "eth";
-let _host = "http://localhost:3000";
-// let _host = "https://docs.recheck.io";
+let hammerNetwork = "ae";
+let hammerBaseUrl = "http://localhost:3000";
+// let hammerBaseUrl = "https://docs.recheck.io";
 
 recheck.debug(false);
 
-recheck.init(_host, undefined, _network);
+recheck.init(hammerBaseUrl, null, hammerNetwork);
+
+
+function isNullAny(...args) {
+    for (let i = 0; i < args.length; i++) {
+        let current = args[i];
+
+        if (current == null //element == null covers element === undefined
+            || (current.hasOwnProperty('length') && current.length === 0) // has length and it's zero
+            || (current.constructor === Object && Object.keys(current).length === 0) // is an Object and has no keys
+            || current.toString().toLowerCase() === 'null'
+            || current.toString().toLowerCase() === 'undefined') {
+
+            return true;
+        }
+    }
+    return false;
+}
 
 function addReExtension(fileName) {
     return fileName.endsWith(".re") ? fileName : `${fileName}.re`;
@@ -45,7 +63,7 @@ function processHostUrl(hostUrl) {
         if (!hostUrl.startsWith("http://") && !hostUrl.startsWith("https://")) {
             hostUrl = `http://${hostUrl}`;
         }
-        recheck.init(hostUrl, undefined, _network);
+        recheck.init(hostUrl, undefined, hammerNetwork);
     }
 }
 
@@ -80,6 +98,7 @@ async function requireAccountOption(fileName, password, login) {
             await recheck.login(loginAccount);
         return loginAccount;
     } catch (loginError) {
+        console.log(loginError)
         console.error("Unable to login with provided identity.");
         process.exit(1);
     }
@@ -201,7 +220,7 @@ program
             if (!publicKey) {
                 console.log("Public key not defined. Will use user specified identity.");
                 let account = await requireAccountOption(program.identityFile, program.password, false);
-                if (_network === "eth") {
+                if (hammerNetwork === "eth") {
                     publicKey = account.address;
                 } else {
                     publicKey = account.publicKey;
@@ -310,16 +329,21 @@ program
 
             let file = await readBinaryFile(fileName);
             let fileA = btoa(file.binary);
+
+            let nameExtensionObj = getFileNameAndExtension(file.name);
+
             let uploadResult = await recheck.store({
-                name: file.name,
+                dataName: nameExtensionObj.dataName,
+                dataExtension: nameExtensionObj.dataExtension,
                 payload: fileA
             }, account.address, account.publicEncKey);
-            if (uploadResult.status !== "OK") {
+
+            if (isNullAny(uploadResult)) {
                 console.error("Error: status", uploadResult.status,
                     "code", uploadResult.code, "message", uploadResult.message);
             } else {
-                if (uploadResult.docId) {
-                    console.log(`${file.name}   ${uploadResult.docId}`);
+                if (uploadResult.dataId) {
+                    console.log(`${file.name}   ${uploadResult.dataId}`);
                 } else {
                     // TODO - return the file id at the check case
                     console.log(uploadResult);
@@ -327,6 +351,21 @@ program
             }
         } catch (error) {
             console.error("Error: failed to upload file. Details:", error);
+        }
+
+        function getFileNameAndExtension(fileName) {
+            let extension = '.unknown';
+            let extensionDotIndex = fileName.lastIndexOf('.');
+
+            if (extensionDotIndex > 0) {
+                extension = fileName.substring(extensionDotIndex);
+                fileName = fileName.substring(0, extensionDotIndex);
+            }
+
+            return {
+                dataName: fileName,
+                dataExtension: extension
+            };
         }
     });
 
@@ -345,11 +384,11 @@ program
 
             let openResult = await recheck.open(fileId, account.publicKey, account);
 
-            if (openResult.code !== 200) {
-                console.error("Error: status", openResult.status, "code", openResult.code);
+            if (isNullAny(openResult)) {
+                console.error("Unable to decrypt or verify file");
             } else {
-                if (openResult.docId) {
-                    let saveName = openResult.name + openResult.extension;
+                if (openResult.dataId) {
+                    let saveName = openResult.dataName + openResult.dataExtension;
                     if (cmdObj.outputFile) saveName = cmdObj.outputFile;
                     try {
                         manageReceipt(cmdObj, saveName, openResult);
@@ -403,7 +442,7 @@ program
             let validateResult = await recheck.validate(data.binary, account.publicKey, fileId);
 
             if (validateResult.status !== "OK"
-                && validateResult.docId === fileId
+                && validateResult.dataId === fileId
                 && validateResult.userId === account.publicKey) {
                 console.log("OK");
             } else {
@@ -424,6 +463,7 @@ program
         try {
             let poll = !!cmdObj.poll;
             let account = await requireAccountOption(program.identityFile, program.password, true);
+            //TODO fix ipo_filing
             let result = await recheck.registerHash(fileId, 'ipo_filing', account.address, account, poll);
             console.log(result);
         } catch (error) {

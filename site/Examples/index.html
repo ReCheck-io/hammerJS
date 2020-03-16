@@ -78,12 +78,134 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="main active"><a href="#examples">Examples</a></li>
+            <li><a href="#new">new</a></li>
+            <li><a href="#reveal">reveal</a></li>
+            <li><a href="#password">password</a></li>
+            <li><a href="#sign-message">sign-message</a></li>
+            <li><a href="#verify-message">verify-message</a></li>
+            <li><a href="#recover">recover</a></li>
+            <li><a href="#login-get-token">login / get Token</a></li>
+            <li><a href="#put-upload-a-file-on-the-blockchain">put - upload a file on the blockchain</a></li>
+            <li><a href="#get-download-a-file-from-the-blockchain">get - download a file from the blockchain</a></li>
+            <li><a href="#share">share</a></li>
+            <li><a href="#verify">verify</a></li>
+            <li><a href="#register-hash">register-hash</a></li>
+            <li><a href="#check-hash">check-hash</a></li>
+            <li><a href="#exec">exec</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
 <h1 id="examples">Examples</h1>
-<p>To start with the tool you need to first have an account. </p></div>
+<p>To start with the tool you need to first have an account. </p>
+<p><code>node hammer --help</code> - leads you to all avaiable commands</p>
+<p><code>node hammer &lt;command&gt; --help</code> - this will give you information about all the different options of the command you want to use. </p>
+<p>The first thing the user has to do is create a new account. This is done by the command <strong>new</strong>. This command is going to create user's identity and put it into a file. The parameters needed for the command are two - the name of the file and the password for that identity. </p>
+<h4 id="new">new</h4>
+<p><code>node hammer new &lt;filename&gt; -e &lt;encryption password&gt;</code>
+<code>node hammer new user -e 123</code></p>
+<p><em>Example output _ - _Recovery phrase: shown use nodal twain burton chute demur hue gg bode culpa least</em> and a file user.re, containing the key pairs, adress and recovery phrase. </p>
+<p><strong>THE RECOVERY PHRASE SHOULD BE KEPT SOMEWHERE SAFE, IF YOU LOSE IT NO ONE CAN RESTORE YOUR BLOCKCHAIN IDENTITY</strong></p>
+<p>Now that you have your identity you can continue using the rest of the commands. </p>
+<h4 id="reveal">reveal</h4>
+<p>First thing you should do, if you already have not, is to <strong>write down your recovery phrase on a paper or somewhere else where it will be safe from outsiders</strong>.</p>
+<p><code>node hammer reveal -i &lt;yourKeysFile.re&gt; -p &lt;yourPassword&gt;</code>
+<em>returns</em>
+- public address - this is also your blockchain ID
+- public signing key 
+- public encryption key </p>
+<p><code>node hammer reveal -i &lt;yourKeysFile.re&gt; -p &lt;yourPassword&gt; -k</code>
+<em>returns</em>
+- public address
+- public signing key
+- private signing key<br />
+- public encryption key
+- private encryption key  </p>
+<p><code>node hammer reveal -i &lt;yourKeysFile.re&gt; -p &lt;yourPassword&gt; -r</code>
+<em>returns</em>
+- public address
+- public signing key
+- public encryption key
+- Recovery phrase: &lt;12 words&gt; - <strong>keep them somewhere safe</strong></p>
+<p>If you put both -r and -k options, you will receive the whole info about your key pairs. </p>
+<h4 id="password">password</h4>
+<p>Setting new password to your keys. </p>
+<p><code>node hammer password &lt;new password&gt; -i yourKeysFile.re -p &lt;password&gt;</code></p>
+<h4 id="sign-message">sign-message</h4>
+<p>Signes a text or file.</p>
+<p><code>node hammer sign-message -i user-eth-1234.re -p 1234 message</code></p>
+<p><em>returns</em> hash with the signature. 
+<em>Signature: 0xdfc6f3a406f168eab0b6e0e7ec0bed942ee1b81f78d77a23738deb25390d42293e45f6243b648d140d0eba9a10419f3244b1847152858bb58c07be419c56f67e1c</em></p>
+<h4 id="verify-message">verify-message</h4>
+<p>It checks the message signature. This function asks for the message/file that has been signed, the signature hash and the public key of the person who signed it. The user can choose to use their file with pair keys instead. </p>
+<p><code>node hammer verify-message LICENSE 0xdfc6f3a406f168eab0b6e0e7ec0bed942ee1b81f78d77a23738deb25390d42293e45f6243b648d140d0eba9a10419f3244b1847152858bb58c07be419c56f67e1c -i user-eth-1234.re -p 1234</code></p>
+<p><em>Returns</em>
+<em>Public key not defined. Will use user specified identity.</em>
+<em>Message is signed with public address 0xAc9d0B1242c0233ff5Cf40d84578140400f35DbA</em></p>
+<h4 id="recover">recover</h4>
+<p>Restores the account from the recovery phrase. <strong>This is the only way to restore your lost key pairs!</strong></p>
+<p><code>node hammer recover &lt;yourNewFileName&gt; -e &lt;yourNewPassword&gt; -r &lt;"your recovery phrase of 12 words"&gt;</code></p>
+<p><code>node hammer recover user -e 1234 -r "shown use nodal twain burton chute demur hue gg bode culpa least"</code>
+<em>returns</em>
+<em>Account recovered 7c0a37cee147b31a86175780b65d10777a157d8ab2075566bba4ab277c799cc18ad9b7b157d6a23ff61805ae74d253a68e1ed42243b20404a191febe81f3ba8e</em></p>
+<h4 id="login-get-token">login / get Token</h4>
+<p>This command allows you to log into the blockchain and more importantly to receive a <strong>token</strong> that you are going to use for communication with the server. </p>
+<p><code>node hammer login -i &lt;yourKeysFile.re&gt; -p &lt;yourPassword&gt;</code></p>
+<p><code>node hammer login -i user-eth-1234.re -p 1234</code></p>
+<p><em>Returns</em>
+Example - <em>f47533d6-b7b1-4b00-b136-ed501897456b</em> - the token needed for communication with the server.</p>
+<h4 id="put-upload-a-file-on-the-blockchain">put - upload a file on the blockchain</h4>
+<p>This command uploads the document on the blockchain. Keep in mind which blockchain network you are using. At the moment our service supports <em>Ethereum</em> and <em>AEternity</em>. It is easy to distinguish them with <em>node hammer reveal</em>, as the aethernity adress and public sign key starts with ak_..., whereas the eth address starts with 0x...</p>
+<p><code>node hammer put &lt;file&gt; -i &lt;yourKeysFile.re&gt; -p &lt;yourPassword&gt;</code></p>
+<p><em>Example</em>
+<code>node hammer put LICENSE -i user-eth-1234.re -p 1234</code>
+<em>Returns</em>
+<em>Name of the file</em> and <em>their hash on the blockchain</em>
+<em>LICENSE   0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274</em></p>
+<h4 id="get-download-a-file-from-the-blockchain">get - download a file from the blockchain</h4>
+<p>The get command gives a lot of options, because you may want different things from file that is already on the chain. </p>
+<pre><code>Options:
+  -s, --save-file               store result in local file
+  -o, --output-file &lt;file&gt;      specify output file
+  -r, --request-tx-receipt      get tx receipt
+  -t, --tx-receipt-file &lt;file&gt;  specify tx receipt file
+  -n, --disable-print           no print in stdio, used with --request-tx-receipt
+  -h, --help                    output usage information
+</code></pre>
+
+<p><em>Examples</em>
+- command -s --save-file
+  <code>node hammer get -s 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 -i user-eth-1234.re -p 1234</code></p>
+<p><em>Returns</em> - downloads the file into the local folder. 
+- command -o --output-file &lt; file &gt; 
+  Downloads the file which is on the blockchain as bytes that will be put in a specified file by the user.</p>
+<p><code>node hammer get -o "example.txt" 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 -i user-eth-1234.re -p 1234</code></p>
+<p><em>Returns</em> - downloads the bytes of the file into specified file by the user, in this case - example.txt is the file being outputted. </p>
+<ul>
+<li>r --request-tx-receipt
+  Outputs the transaction receipt. </li>
+</ul>
+<p><code>node hammer get -r 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 -i user-eth-1234.re -p 1234</code></p>
+<p><em>Returns</em> - a file with the tx and the tx in the console
+  <em>TUlUIExpY2Vuc2UKCkNvcHlyaWdodCAoYykgMjAyMCBSZUNoZWNrCgpQZXJtaXNzaW9uIGlzIGhlcmVieSBncmFudGVkLCBmcmVlIG9mIGNoYXJnZSwgdG8gYW55IHBlcnNvbiBvYnRhaW5pbmcgYSBjb3B5Cm9mIHRoaXMgc29mdHdhcmUgYW5kIGFzc29jaWF0ZWQgZG9jdW1lbnRhdGlvbiBmaWxlcyAodGhlICJTb2Z0d2FyZSIpLCB0byBkZWFsCmluIHRoZSBTb2Z0d2FyZSB3aXRob3V0IHJlc3RyaWN0aW9uLCBpbmNsdWRpbmcgd2l0aG91dCBsaW1pdGF0aW9uIHRoZSByaWdodHMKdG8gdXNlLCBjb3B5LCBtb2RpZnksIG1lcmdlLCBwdWJsaXNoLCBkaXN0cmlidXRlLCBzdWJsaWNlbnNlLCBhbmQvb3Igc2VsbApjb3BpZXMgb2YgdGhlIFNvZnR3YXJlLCBhbmQgdG8gcGVybWl0IHBlcnNvbnMgdG8gd2hvbSB0aGUgU29mdHdhcmUgaXMKZnVybmlzaGVkIHRvIGRvIHNvLCBzdWJqZWN0IHRvIHRoZSBmb2xsb3dpbmcgY29uZGl0aW9uczoKClRoZSBhYm92ZSBjb3B5cmlnaHQgbm90aWNlIGFuZCB0aGlzIHBlcm1pc3Npb24gbm90aWNlIHNoYWxsIGJlIGluY2x1ZGVkIGluIGFsbApjb3BpZXMgb3Igc3Vic3RhbnRpYWwgcG9ydGlvbnMgb2YgdGhlIFNvZnR3YXJlLgoKVEhFIFNPRlRXQVJFIElTIFBST1ZJREVEICJBUyBJUyIsIFdJVEhPVVQgV0FSUkFOVFkgT0YgQU5ZIEtJTkQsIEVYUFJFU1MgT1IKSU1QTElFRCwgSU5DTFVESU5HIEJVVCBOT1QgTElNSVRFRCBUTyBUSEUgV0FSUkFOVElFUyBPRiBNRVJDSEFOVEFCSUxJVFksCkZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFIEFORCBOT05JTkZSSU5HRU1FTlQuIElOIE5PIEVWRU5UIFNIQUxMIFRIRQpBVVRIT1JTIE9SIENPUFlSSUdIVCBIT0xERVJTIEJFIExJQUJMRSBGT1IgQU5ZIENMQUlNLCBEQU1BR0VTIE9SIE9USEVSCkxJQUJJTElUWSwgV0hFVEhFUiBJTiBBTiBBQ1RJT04gT0YgQ09OVFJBQ1QsIFRPUlQgT1IgT1RIRVJXSVNFLCBBUklTSU5HIEZST00sCk9VVCBPRiBPUiBJTiBDT05ORUNUSU9OIFdJVEggVEhFIFNPRlRXQVJFIE9SIFRIRSBVU0UgT1IgT1RIRVIgREVBTElOR1MgSU4gVEhFClNPRlRXQVJFLgo=</em></p>
+<ul>
+<li>t --tx-receipt-file &lt; file &gt;
+  Outputs the transaction receipt in the console and saves it in the user specified file. </li>
+</ul>
+<p><code>node hammer get -t tx.txt 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 -i user-eth-1234.re -p 1234</code></p>
+<p><em>Returns</em> - the transaction receipt in tx.txt </p>
+<ul>
+<li>n --disable-print </li>
+</ul>
+<p>With this command you will not get the tx-receipt in the console, only in the file.</p>
+<p><code>node hammer get -t tx.txt 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 -i user-eth-1234.re -p 1234 -n</code></p>
+<h4 id="share">share</h4>
+<p>Shares a file with other users in the system. Can share to as many as the user wants</p>
+<p><code>node hammer share &lt;fileChainID&gt; &lt;recipientUserChainID&gt; &lt;anotherRecipientUserChainID&gt; -i user-eth-1234.re -p 1234</code></p>
+<h4 id="verify">verify</h4>
+<h4 id="register-hash">register-hash</h4>
+<h4 id="check-hash">check-hash</h4>
+<h4 id="exec">exec</h4></div>
         </div>
 
         <footer class="col-md-12">
