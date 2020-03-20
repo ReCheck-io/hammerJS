@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const recheck = require('./recheck-client');
+const recheck = require('recheck-clientjs-library');
 
 const program = require('commander');
 const fs = require('fs');
@@ -433,6 +433,24 @@ program
     });
 
 program
+    .command('sign <file-id>')
+    .description('sign file')
+    .option('-l, --poll', 'poll for tx receipt')
+    .action(async function (fileId, cmdObj) {
+        processHostUrl(program.hostUrl);
+
+        try {
+            let poll = !!cmdObj.poll;
+            let account = await requireAccountOption(program.identityFile, program.password, true);
+
+            let result = await recheck.sign(fileId, account.address, account, poll);
+            console.log(result);
+        } catch (error) {
+            console.error("File signing failed. Error details", error);
+        }
+    });
+
+program
     .command('verify <file-id> <file-name>')
     .description('verify the file identifier against the content file')
     .action(async function (fileId, fileName) {
@@ -493,33 +511,39 @@ program
     .description('execute command on a selection')
     .option('-a, --authorize-open', 'authorize a browser to decrypt and open files')
     .option('-s, --authorize-share', 'authorizes a browser to share files')
+    .option('-w, --authorize-sign', 'authorizes a browser to sign files')
     .action(async function (selectionHash, cmdObj) {
         try {
             processHostUrl(program.hostUrl);
 
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
-            if (!selectionHash.startsWith("o:")
-                && !selectionHash.startsWith("s:")
-                && !selectionHash.startsWith("mo:")) {
+            let selectionHashCmd = selectionHash.substr(0, 3);
+            if (!["bo:", "mo:", "sh:", "sg:"].includes(selectionHashCmd)) {
 
-                let commandOption;
-                if (cmdObj.authorizeOpen) {
-                    commandOption = "o";
-                }
+                let authorizeOpen = cmdObj.authorizeOpen;
+                let authorizeShare = cmdObj.authorizeShare;
+                let authorizeSign = cmdObj.authorizeSign;
 
-                if (cmdObj.authorizeShare) {
-                    if (commandOption) {
-                        console.error("You can specify only either open or share");
-                        process.exit(1);
-                    } else {
-                        commandOption = "s";
-                    }
-                }
+                let optionsArray = [authorizeOpen, authorizeShare, authorizeSign];
+                let firstTrueValueIndex = optionsArray.indexOf(true);
+                let lastTrueValueIndex = optionsArray.lastIndexOf(true);
 
-                if (!commandOption) {
+                if (firstTrueValueIndex !== lastTrueValueIndex) {
+                    console.error("You can specify only one of open or share or sign");
+                    process.exit(1);
+                } else if (firstTrueValueIndex < 0) {
                     console.error("Explicit command option needed.");
                     process.exit(1);
+                }
+
+                let commandOption;
+                if (authorizeOpen) {
+                    commandOption = "bo";
+                } else if (authorizeShare) {
+                    commandOption = "sh";
+                } else if (authorizeSign) {
+                    commandOption = "sg";
                 }
 
                 selectionHash = `${commandOption}:${selectionHash}`;

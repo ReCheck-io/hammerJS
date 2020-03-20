@@ -160,4 +160,6 @@ Shares a file with other users in the system. Can share to as many as the user w
 
 #### check-hash
 
+#### sign // you can do the signature with exec function as well
+
 #### exec 

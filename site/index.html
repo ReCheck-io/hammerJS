@@ -85,7 +85,9 @@
 
 <h1 id="hammerjs">hammerJS</h1>
 <p>A Command line tool (CLI) that utilizes recheck-clientjs-library. You can connect and do various things on a blockchain. </p>
-<p>Usage: <code>hammer [options] [command]</code></p>
+<p>Usage: </p>
+<p><code>const recheck = require('recheck-clientjs-library');</code></p>
+<p><code>hammer [options] [command]</code></p>
 <p>Options:</p>
 <pre><code>  -V, --version                                         output the version number
   -i, --identity-file &lt;file&gt;                            specify identity file
@@ -105,6 +107,7 @@
   put &lt;file-name&gt;                                       stores file securely and timestamps it
   get [options] &lt;file-id&gt;                               securely fetch and decrypt a file
   share &lt;file-id&gt; &lt;recipient-id&gt; [moreRecipientIds...]  share securely a file with multiple recipients
+  sign [options] &lt;file-id&gt;                              sign file
   verify &lt;file-id&gt; &lt;file-name&gt;                          verify the file identifier against the content file
   register-hash [options] &lt;file-id&gt;                     register file identifier
   check-hash [options] &lt;file-id&gt;                        check the file identifier and retrieve tx info
@@ -151,5 +154,5 @@
 
 <!--
 MkDocs version : 0.16.3
-Build Date UTC : 2020-03-16 09:37:04
+Build Date UTC : 2020-03-20 08:11:09
 -->

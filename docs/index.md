@@ -1,7 +1,12 @@
 # hammerJS
 A Command line tool (CLI) that utilizes recheck-clientjs-library. You can connect and do various things on a blockchain. 
 
-Usage: ```hammer [options] [command]```
+Usage: 
+
+```const recheck = require('recheck-clientjs-library');```
+
+
+```hammer [options] [command]```
 
 Options:
 
@@ -25,6 +30,7 @@ Commands:
   put <file-name>                                       stores file securely and timestamps it
   get [options] <file-id>                               securely fetch and decrypt a file
   share <file-id> <recipient-id> [moreRecipientIds...]  share securely a file with multiple recipients
+  sign [options] <file-id>                              sign file
   verify <file-id> <file-name>                          verify the file identifier against the content file
   register-hash [options] <file-id>                     register file identifier
   check-hash [options] <file-id>                        check the file identifier and retrieve tx info
