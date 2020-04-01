@@ -18,21 +18,7 @@ recheck.debug(false);
 recheck.init(hammerBaseUrl, null, hammerNetwork);
 
 
-function isNullAny(...args) {
-    for (let i = 0; i < args.length; i++) {
-        let current = args[i];
-
-        if (current == null //element == null covers element === undefined
-            || (current.hasOwnProperty('length') && current.length === 0) // has length and it's zero
-            || (current.constructor === Object && Object.keys(current).length === 0) // is an Object and has no keys
-            || current.toString().toLowerCase() === 'null'
-            || current.toString().toLowerCase() === 'undefined') {
-
-            return true;
-        }
-    }
-    return false;
-}
+const isNullAny = (...elements) => recheck.isNullAny(...elements);
 
 function addReExtension(fileName) {
     return fileName.endsWith(".re") ? fileName : `${fileName}.re`;
@@ -98,7 +84,7 @@ async function requireAccountOption(fileName, password, login) {
             await recheck.login(loginAccount);
         return loginAccount;
     } catch (loginError) {
-        console.log(loginError)
+        console.log(loginError);
         console.error("Unable to login with provided identity.");
         process.exit(1);
     }
@@ -319,9 +305,10 @@ program
     });
 
 program
-    .command('put <file-name>',)
+    .command('put <file-name>')
     .description('stores file securely and timestamps it')
-    .action(async function (fileName) {
+    .option('-x, --external <external-id>', 'register external id for file')
+    .action(async function (fileName, cmdObj) {
         try {
             processHostUrl(program.hostUrl);
             let account = await requireAccountOption(program.identityFile, program.password, true);
@@ -336,14 +323,14 @@ program
                 dataName: nameExtensionObj.dataName,
                 dataExtension: nameExtensionObj.dataExtension,
                 payload: fileA
-            }, account.address, account.publicEncKey);
+            }, account.address, account.publicEncKey, cmdObj.external);
 
             if (isNullAny(uploadResult)) {
                 console.error("Error: status", uploadResult.status,
                     "code", uploadResult.code, "message", uploadResult.message);
             } else {
                 if (uploadResult.dataId) {
-                    console.log(`${file.name}   ${uploadResult.dataId}`);
+                    console.log(`${file.name} ${uploadResult.dataId}`);
                 } else {
                     // TODO - return the file id at the check case
                     console.log(uploadResult);
@@ -377,12 +364,13 @@ program
     .option('-r, --request-tx-receipt', 'get tx receipt')
     .option('-t, --tx-receipt-file <file>', 'specify tx receipt file')
     .option('-n, --disable-print', 'no print in stdio, used with --request-tx-receipt')
+    .option('-x, --external', 'provided identifier is external')
     .action(async function (fileId, cmdObj) {
         try {
             processHostUrl(program.hostUrl);
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
-            let openResult = await recheck.open(fileId, account.publicKey, account);
+            let openResult = await recheck.open(fileId, account.publicKey, account, cmdObj.external);
 
             if (isNullAny(openResult)) {
                 console.error("Unable to decrypt or verify file");
@@ -412,14 +400,16 @@ program
 program
     .command('share <file-id> <recipient-id> [moreRecipientIds...]')
     .description('share securely a file with multiple recipients')
-    .action(async function (fileId, recipientId, moreRecipientIds) {
+    .option('-x, --external', 'provided identifier is external')
+    .action(async function (fileId, recipientId, moreRecipientIds, cmdObj) {
         processHostUrl(program.hostUrl);
         let account = await requireAccountOption(program.identityFile, program.password, true);
+
         moreRecipientIds.push(recipientId);
         if (moreRecipientIds.length > 0) {
             for (let i = 0; i < moreRecipientIds.length; i++) {
                 try {
-                    let nextShareResult = await recheck.share(fileId, moreRecipientIds[i], account);
+                    let nextShareResult = await recheck.share(fileId, moreRecipientIds[i], account, cmdObj.external);
                     if (nextShareResult.status !== "ERROR") {
                         console.log(fileId, "->", moreRecipientIds[i], "OK");
                     } else {
@@ -436,14 +426,14 @@ program
     .command('sign <file-id>')
     .description('sign file')
     .option('-l, --poll', 'poll for tx receipt')
+    .option('-x, --external', 'provided identifier is external')
     .action(async function (fileId, cmdObj) {
         processHostUrl(program.hostUrl);
 
         try {
-            let poll = !!cmdObj.poll;
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
-            let result = await recheck.sign(fileId, account.address, account, poll);
+            let result = await recheck.sign(fileId, account.address, account, cmdObj.poll, cmdObj.external);
             console.log(result);
         } catch (error) {
             console.error("File signing failed. Error details", error);
@@ -453,11 +443,13 @@ program
 program
     .command('verify <file-id> <file-name>')
     .description('verify the file identifier against the content file')
-    .action(async function (fileId, fileName) {
+    .option('-x, --external', 'provided identifier is external')
+    .action(async function (fileId, fileName, cmdObj) {
         try {
             let account = await requireAccountOption(program.identityFile, program.password, true);
+
             let data = await readBinaryFile(fileName);
-            let validateResult = await recheck.validate(data.binary, account.publicKey, fileId);
+            let validateResult = await recheck.validate(data.binary, account.publicKey, fileId, cmdObj.external);
 
             if (validateResult.status !== "OK"
                 && validateResult.dataId === fileId
@@ -472,17 +464,20 @@ program
     });
 
 program
-    .command('register-hash <file-id>')
+    .command('register-hash <file-id> [extraTrailHashes...]')
     .description('register file identifier')
     .option('-l, --poll', 'poll for tx receipt')
-    .action(async function (fileId, cmdObj) {
+    .action(async function (fileId, extraTrailHashes, cmdObj) {
         processHostUrl(program.hostUrl);
 
         try {
-            let poll = !!cmdObj.poll;
             let account = await requireAccountOption(program.identityFile, program.password, true);
+
+            if (isNullAny(extraTrailHashes)) {
+                extraTrailHashes = [];
+            }
             //TODO fix ipo_filing
-            let result = await recheck.registerHash(fileId, 'ipo_filing', account.address, account, poll);
+            let result = await recheck.registerHash(fileId, 'ipo_filing', account.address, account, extraTrailHashes, cmdObj.poll);
             console.log(result);
         } catch (error) {
             console.error("File verification failed. Error details", error);
@@ -493,18 +488,56 @@ program
     .command('check-hash <file-id>')
     .description('check the file identifier and retrieve tx info')
     .option('-r, --request-id <request-id>', 'filter result by request id')
+    .option('-x, --external', 'provided identifier is external')
     .action(async function (fileId, cmdObj) {
         processHostUrl(program.hostUrl);
         try {
             let account = await requireAccountOption(program.identityFile, program.password, true);
+
             let requestId = cmdObj.requestId;
-            let result = await recheck.verifyHash(fileId, account.address, requestId);
+            let result = await recheck.verifyHash(fileId, account.address, requestId, cmdObj.external);
             console.log(result);
         } catch (error) {
             console.error("File verification failed. Error details", error);
         }
     });
 
+program
+    .command('external-put <external-id>')
+    .description('register external id for file identifier')
+    .option('-h, --hash <hash>', 'provide optional file original hash')
+    .action(async function (externalId, cmdObj) {
+        processHostUrl(program.hostUrl);
+
+        try {
+            let hash = cmdObj.hash;
+
+            if (isNullAny(hash)) {
+                hash = null;
+            }
+
+            let account = await requireAccountOption(program.identityFile, program.password, true);
+
+            let result = await recheck.saveExternalId(externalId, account.address, hash);
+            console.log(result);
+        } catch (error) {
+            console.error("External id registration failed. Error details", error);
+        }
+    });
+
+program
+    .command('external-get <external-id>')
+    .description('obtain file identifier from external id')
+    .action(async function (externalId) {
+        processHostUrl(program.hostUrl);
+        try {
+            let account = await requireAccountOption(program.identityFile, program.password, true);
+            let result = await recheck.convertExternalId(externalId, account.address);
+            console.log(result);
+        } catch (error) {
+            console.error("File id conversion failed. Error details", error);
+        }
+    });
 
 program
     .command('exec <selection-hash>')
