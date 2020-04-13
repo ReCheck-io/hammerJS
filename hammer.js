@@ -101,7 +101,7 @@ function requireFileName(fileName) {
 function manageReceipt(cmdObj, saveName, openResult) {
     if (cmdObj.requestTxReceipt) {
         let receiptName = `${saveName}.receipt`;
-        if (cmdObj.txReceiptFile) {
+        if (cmdObj.receiptFile) {
             receiptName = cmdObj.txReceiptFile;
             if (receiptName === saveName)
                 receiptName = `${receiptName}.receipt`;
@@ -308,6 +308,8 @@ program
     .command('put <file-name>')
     .description('stores file securely and timestamps it')
     .option('-x, --external <external-id>', 'register external id for file')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
     .action(async function (fileName, cmdObj) {
         try {
             processHostUrl(program.hostUrl);
@@ -323,7 +325,7 @@ program
                 dataName: nameExtensionObj.dataName,
                 dataExtension: nameExtensionObj.dataExtension,
                 payload: fileA
-            }, account.address, account.publicEncKey, cmdObj.external);
+            }, account.address, account.publicEncKey, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
 
             if (isNullAny(uploadResult)) {
                 console.error("Error: status", uploadResult.status,
@@ -361,16 +363,18 @@ program
     .description('securely fetch and decrypt a file')
     .option('-s, --save-file', 'store result in local file')
     .option('-o, --output-file <file>', 'specify output file')
-    .option('-r, --request-tx-receipt', 'get tx receipt')
-    .option('-t, --tx-receipt-file <file>', 'specify tx receipt file')
+    .option('-r, --request-tx-receipt', 'get tx receipt')//TODO remove because of txPoll
+    .option('-f, --receipt-file <file>', 'specify tx receipt file')//TODO remove or fix recheck.open so it returns file + receipt
     .option('-n, --disable-print', 'no print in stdio, used with --request-tx-receipt')
     .option('-x, --external', 'provided identifier is external')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
     .action(async function (fileId, cmdObj) {
         try {
             processHostUrl(program.hostUrl);
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
-            let openResult = await recheck.open(fileId, account.publicKey, account, cmdObj.external);
+            let openResult = await recheck.open(fileId, account.publicKey, account, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
 
             if (isNullAny(openResult)) {
                 console.error("Unable to decrypt or verify file");
@@ -398,9 +402,36 @@ program
     });
 
 program
+    .command('verify <file-id> <file-name>')
+    .description('verify the file identifier against the content file')
+    .option('-x, --external', 'provided identifier is external')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for verification of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
+    .action(async function (fileId, fileName, cmdObj) {
+        try {
+            let account = await requireAccountOption(program.identityFile, program.password, true);
+
+            let data = await readBinaryFile(fileName);
+            let validateResult = await recheck.validate(data.binary, account.publicKey, fileId, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
+
+            if (validateResult.status !== "OK"
+                && validateResult.dataId === fileId
+                && validateResult.userId === account.publicKey) {
+                console.log("OK");
+            } else {
+                console.log("NOK");
+            }
+        } catch (error) {
+            console.error("File verification failed. Error details", error);
+        }
+    });
+
+program
     .command('share <file-id> <recipient-id> [moreRecipientIds...]')
     .description('share securely a file with multiple recipients')
     .option('-x, --external', 'provided identifier is external')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
     .action(async function (fileId, recipientId, moreRecipientIds, cmdObj) {
         processHostUrl(program.hostUrl);
         let account = await requireAccountOption(program.identityFile, program.password, true);
@@ -409,7 +440,7 @@ program
         if (moreRecipientIds.length > 0) {
             for (let i = 0; i < moreRecipientIds.length; i++) {
                 try {
-                    let nextShareResult = await recheck.share(fileId, moreRecipientIds[i], account, cmdObj.external);
+                    let nextShareResult = await recheck.share(fileId, moreRecipientIds[i], account, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
                     if (nextShareResult.status !== "ERROR") {
                         console.log(fileId, "->", moreRecipientIds[i], "OK");
                     } else {
@@ -425,15 +456,16 @@ program
 program
     .command('sign <file-id>')
     .description('sign file')
-    .option('-l, --poll', 'poll for tx receipt')
     .option('-x, --external', 'provided identifier is external')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
     .action(async function (fileId, cmdObj) {
         processHostUrl(program.hostUrl);
 
         try {
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
-            let result = await recheck.sign(fileId, account.address, account, cmdObj.poll, cmdObj.external);
+            let result = await recheck.sign(fileId, account.address, account, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
             console.log(result);
         } catch (error) {
             console.error("File signing failed. Error details", error);
@@ -441,32 +473,12 @@ program
     });
 
 program
-    .command('verify <file-id> <file-name>')
-    .description('verify the file identifier against the content file')
-    .option('-x, --external', 'provided identifier is external')
-    .action(async function (fileId, fileName, cmdObj) {
-        try {
-            let account = await requireAccountOption(program.identityFile, program.password, true);
-
-            let data = await readBinaryFile(fileName);
-            let validateResult = await recheck.validate(data.binary, account.publicKey, fileId, cmdObj.external);
-
-            if (validateResult.status !== "OK"
-                && validateResult.dataId === fileId
-                && validateResult.userId === account.publicKey) {
-                console.log("OK");
-            } else {
-                console.log("NOK");
-            }
-        } catch (error) {
-            console.error("File verification failed. Error details", error);
-        }
-    });
-
-program
     .command('register-hash <file-id> [extraTrailHashes...]')
     .description('register file identifier')
-    .option('-l, --poll', 'poll for tx receipt')
+    .option('-y, --request-type <type>', 'select supported trail hash request type register is default')
+    .option('-r, --request-id <id>', 'provide request id for additional check-hash filter')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
     .action(async function (fileId, extraTrailHashes, cmdObj) {
         processHostUrl(program.hostUrl);
 
@@ -476,8 +488,8 @@ program
             if (isNullAny(extraTrailHashes)) {
                 extraTrailHashes = [];
             }
-            //TODO fix ipo_filing
-            let result = await recheck.registerHash(fileId, 'ipo_filing', account.address, account, extraTrailHashes, cmdObj.poll);
+
+            let result = await recheck.registerHash(fileId, cmdObj.requestType, account.address, account, cmdObj.requestId, extraTrailHashes, cmdObj.txPoll, cmdObj.extra);
             console.log(result);
         } catch (error) {
             console.error("File verification failed. Error details", error);
@@ -494,8 +506,7 @@ program
         try {
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
-            let requestId = cmdObj.requestId;
-            let result = await recheck.verifyHash(fileId, account.address, requestId, cmdObj.external);
+            let result = await recheck.checkHash(fileId, account.address, cmdObj.requestId, cmdObj.external);
             console.log(result);
         } catch (error) {
             console.error("File verification failed. Error details", error);
@@ -545,6 +556,9 @@ program
     .option('-a, --authorize-open', 'authorize a browser to decrypt and open files')
     .option('-s, --authorize-share', 'authorizes a browser to share files')
     .option('-w, --authorize-sign', 'authorizes a browser to sign files')
+    .option('-o, --open', 'receive decrypted file payload')
+    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+    .option('-t, --tx-poll', 'poll for tx receipt')
     .action(async function (selectionHash, cmdObj) {
         try {
             processHostUrl(program.hostUrl);
@@ -552,7 +566,7 @@ program
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
             let selectionHashCmd = selectionHash.substr(0, 3);
-            if (!["bo:", "mo:", "sh:", "sg:"].includes(selectionHashCmd)) {
+            if (!["op:", "re:", "sh:", "sg:"].includes(selectionHashCmd)) {
 
                 let authorizeOpen = cmdObj.authorizeOpen;
                 let authorizeShare = cmdObj.authorizeShare;
@@ -572,17 +586,19 @@ program
 
                 let commandOption;
                 if (authorizeOpen) {
-                    commandOption = "bo";
+                    commandOption = "re";
                 } else if (authorizeShare) {
                     commandOption = "sh";
                 } else if (authorizeSign) {
                     commandOption = "sg";
+                } else if (open) {
+                    commandOption = "op";
                 }
 
                 selectionHash = `${commandOption}:${selectionHash}`;
             }
 
-            let execResult = await recheck.execSelection(selectionHash, account);
+            let execResult = await recheck.execSelection(selectionHash, account, cmdObj.txPoll, cmdObj.extra);
 
             if (execResult.status === "ERROR") {
                 console.error("Error: status", execResult.status, "code", execResult.code);
