@@ -15,7 +15,7 @@ let hammerBaseUrl = "http://localhost:3000";
 
 recheck.debug(false);
 
-recheck.init(hammerBaseUrl, null, hammerNetwork);
+recheck.init(hammerBaseUrl, hammerNetwork);
 
 
 const isNullAny = (...elements) => recheck.isNullAny(...elements);
@@ -49,7 +49,7 @@ function processHostUrl(hostUrl) {
         if (!hostUrl.startsWith("http://") && !hostUrl.startsWith("https://")) {
             hostUrl = `http://${hostUrl}`;
         }
-        recheck.init(hostUrl, undefined, hammerNetwork);
+        recheck.init(hostUrl, hammerNetwork);
     }
 }
 
