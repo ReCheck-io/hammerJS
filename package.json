@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/ReCheck-io/hammerJS#readme",
   "dependencies": {
-    "recheck-clientjs-library": "^1.0.12"
+    "recheck-clientjs-library": "^1.0.15"
   }
 }
