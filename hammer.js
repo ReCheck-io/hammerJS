@@ -285,6 +285,19 @@ program
     });
 
 program
+    .command('info')
+    .description('obtain API version and blockchain type')
+    .action(async function () {
+        processHostUrl(program.hostUrl);
+        try {
+            let info = await recheck.getServerInfo();
+            console.log(info);
+        } catch (error) {
+            console.error("Obtain server info failed.", error);
+        }
+    });
+
+program
     .command('login')
     .description('obtain an API token')
     .option('-c, --challenge <challenge>', 'specify login challenge')
@@ -475,6 +488,7 @@ program
 program
     .command('register-hash <file-id> [extraTrailHashes...]')
     .description('register file identifier')
+    //TODO restrict request types because of txManager
     .option('-y, --request-type <type>', 'select supported trail hash request type register is default')
     .option('-r, --request-id <id>', 'provide request id for additional check-hash filter')
     .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
