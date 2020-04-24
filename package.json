@@ -1,6 +1,6 @@
 {
   "name": "recheck-hammerjs",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A CLI program that utilizes ReCheck encryption library ",
   "main": "hammer.js",
   "directories": {
