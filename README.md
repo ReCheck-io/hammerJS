@@ -1,5 +1,4 @@
-[![Website recheck.io](https://img.shields.io/badge/Website-recheck.io-brightgreen.svg)](https://recheck.io/) [![npm version](https://badge.fury.io/js/recheck-hammerjs.svg)](https://badge.fury.io/js/recheck-hammerjs)
-
+[![Website recheck.io](https://img.shields.io/badge/Website-recheck.io-brightgreen.svg)](https://recheck.io/) [![npm version](https://badge.fury.io/js/recheck-hammerjs.svg)](https://badge.fury.io/js/recheck-hammerjs) <a href="https://discord.gg/a2S6WX"><img src="https://img.shields.io/discord/675683560673509386?logo=discord" alt="chat on Discord"></a>
 # hammerJS
 A Command line tool (CLI) that utilizes recheck-clientjs-library. You can connect to the blockchain and upload, download, share and sign files. 
 
