@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
-const recheck = require('recheck-clientjs-library');
+let recheck;
+try {
+    recheck = require('../recheck-clientjs-library');
+} catch (ignored) {
+    recheck = require('recheck-clientjs-library');
+}
 
 const program = require('commander');
 const fs = require('fs');
