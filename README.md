@@ -9,10 +9,13 @@ You can find the **the documentation [here](docs/index.md)**
 ## Requirements
 
 - npm version 8.15 or above 
+- ```git clone https://github.com/ReCheck-io/hammerJS.git```
+- ```cd hammerJS```
 - ```npm i recheck-hammerjs ```
 
 
 ## Getting started 
+This is a CLI(command line tool) program, so you have to type all the commands in the terminal (UNIX) or via cmd/cygwin/bash terminal in Windows.  
 
 ### The first step 
 
@@ -21,7 +24,7 @@ To work on our test environment, you will have to remember to always put ```-u h
 ##### new blockchain identity
 Create your identity (account/wallet, containing your keys that connect you to the blockchain).
 
-```node hammer -u https://beta.recheck.io new -i <yourChosenIdentityFileName> -e <yourChosenPassword>```
+```node hammer -u https://beta.recheck.io new <yourChosenIdentityFileName> -e <yourChosenPassword>```
 
 This command will create a file, in the current folder, containing your identity. 
 
@@ -29,11 +32,11 @@ This command will create a file, in the current folder, containing your identity
 
 Next you can login and requesting a token by executing the following command. 
 
-``` node hammer -u https://beta.recheck.io login -i <yourChosenIdentityFileName>.re -p <yourChosenPassword> ```
+``` node hammer -u https://beta.recheck.io -i <yourChosenIdentityFileName>.re -p <yourChosenPassword> login ```
 
 If you want to enter the GUI, you can provide the parameter -c following the hash from the QR you are seeing on the first page. 
 _Example_
-``` node hammer -u https://beta.recheck.io login -i daka-123.re -p 123 -c 0x3612053066ad3df8d6c2266d845c912ab89d2e717e57f92e11d346099506615a ```
+``` node hammer -u https://beta.recheck.io -i daka-123.re -p 123 login -c 0x3612053066ad3df8d6c2266d845c912ab89d2e717e57f92e11d346099506615a ```
 
 ##### upload a file
 
@@ -41,21 +44,21 @@ The next two key features you can do even without using the GUI are to upload an
 
 To upload the command is: 
 
-```node hammer -u https://beta.recheck.io put <file> -i <yourKeysFile.re> -p <yourPassword>```
+```node hammer -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> put <file> ```
 
 _Example_
-```node hammer -u https://beta.recheck.io put LICENSE.txt -i daka-123.re -p 123```
+```node hammer -u https://beta.recheck.io -i daka-123.re -p 123 put LICENSE.txt ```
 _Returns_
 _Name of the file_ and _their hash on the blockchain_
 _LICENSE.txt   0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274_
 
 ##### download a file 
 To download the command is :
-```node hammer -u https://beta.recheck.io get -s 0x...hash of the file... -i <yourKeysFile.re> -p <yourPassword>```
+```node hammer -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> get -s 0x...hash of the file...```
 
 _Example_
 command -s --save-file
-  ```node hammer -u https://beta.recheck.io get -s 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 -i user-eth-1234.re -p 1234```
+  ```node hammer -u https://beta.recheck.io -i user-eth-1234.re -p 1234 get -s 0x80783e8c67d06e66d45219fcff329f63dba475d5ceb930d74ccf1b1a19397274 ```
 
   _Returns_ - downloads the file into the local folder. 
 
@@ -63,7 +66,7 @@ command -s --save-file
 
 To share a file you will need to provide the file's blockchain ID, and the user id of the user(s) you want to share it with. 
 
-```node hammer.js https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> share 0x..file'sId.. ak_..user'sID```
+```node hammer.js -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> share 0x..file'sId.. ak_..user'sID```
 
 _Example_
 
@@ -79,7 +82,7 @@ _returns_
 
 The signature is a transaction that represents user's valiidation of the selected file.
 
-```node hammer.js https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> sign 0x..file'sId..```
+```node hammer.js -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> sign 0x..file'sId..```
 
 _Example_
 ```
@@ -95,14 +98,14 @@ _returns_
 ##### share, open one or several files at once and sign a file with exec command
 For these commands you will need to be logged into the GUI service. To execute one of these actions, you will need generate a hash by pushing one of the GUI buttons - share/open/sign. Afterwards this hash has to be executed with the __exec__ command in hammer.
 
-```node hammer.js https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> exec <action>:0x...hash...```
+```node hammer.js -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> exec <action>:0x...hash...```
 four actions to execute this command: 
 
 ##### open - re:  
 
 This command will re encrypt and reconstruct the contents of the file to the current user. It is being used to reencrypt on the browser and show decrypted contents in the GUI.
 
-```node hammer.js -i test-users/user1-ae-123.re -p 123 exec re:0x077dd4f4933cf86a8df127612e6426527c4804fac2c5eac57fccd4979fc241c0```
+```node hammer.js -u https://beta.recheck.io -i test-users/user1-ae-123.re -p 123 exec re:0x077dd4f4933cf86a8df127612e6426527c4804fac2c5eac57fccd4979fc241c0```
 
 _returns_
 ```
@@ -141,7 +144,7 @@ This command will return the contents of the file as bytes to be reconstructed o
 
 Before using this command in the GUI you have to select the person and the file you want to share. It will then generate the QR code to execute it like in the following example. 
 
-node hammer.js -i test-users/user1-ae-123.re -p 123 exec sh:0x776e8cbb4db9fc290a1fb08bf7fcaf91b5913b4bae32085568f8ebd6a15086ed
+```node hammer.js -u https://beta.recheck.io -i test-users/user1-ae-123.re -p 123 exec sh:0x776e8cbb4db9fc290a1fb08bf7fcaf91b5913b4bae32085568f8ebd6a15086ed```
 
 _returns_
 
@@ -156,7 +159,7 @@ _returns_
 
 In the GUI you will have to select the file and click the Sign button to generate the hash. 
 
-```node hammer.js -i test-users/user1-ae-123.re -p 123 exec sg:0xf49c1f9cceb016ca2e5bbcd57f24a3b65d3c210c64c747f95fa3365e30a3f1e6```
+```node hammer.js -u https://beta.recheck.io -i test-users/user1-ae-123.re -p 123 exec sg:0xf49c1f9cceb016ca2e5bbcd57f24a3b65d3c210c64c747f95fa3365e30a3f1e6```
 
 _returns_
 
