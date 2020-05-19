@@ -11,7 +11,7 @@ You can find the **the documentation [here](docs/index.md)**
 - npm version 8.15 or above 
 - ```git clone https://github.com/ReCheck-io/hammerJS.git```
 - ```cd hammerJS```
-- ```npm i recheck-hammerjs ```
+- ```npm install ```
 
 
 ## Getting started 
