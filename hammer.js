@@ -619,7 +619,7 @@ program
 
             let execResult = await recheck.execSelection(selectionHash, account, cmdObj.txPoll, cmdObj.extra);
 
-            console.log(execResult);
+            console.log(JSON.stringify(execResult, null, 4));
         } catch (error) {
             console.error("Error: failed to execute selection command. Details:", JSON.stringify(error));
         }
