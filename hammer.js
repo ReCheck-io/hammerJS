@@ -574,6 +574,7 @@ program
     .description('execute command on a selection')
     .option('-a, --authorize-open', 'authorize a browser to decrypt and open files')
     .option('-s, --authorize-share', 'authorizes a browser to share files')
+    .option('-u, --authorize-email', 'authorizes a browser to share files via url')
     .option('-w, --authorize-sign', 'authorizes a browser to sign files')
     .option('-o, --open', 'receive decrypted file payload')
     .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
@@ -585,10 +586,11 @@ program
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
             let selectionHashCmd = selectionHash.substr(0, 3);
-            if (!["op:", "re:", "sh:", "sg:"].includes(selectionHashCmd)) {
+            if (!["op:", "re:", "sh:", "se:", "sg:"].includes(selectionHashCmd)) {
 
                 let authorizeOpen = cmdObj.authorizeOpen;
                 let authorizeShare = cmdObj.authorizeShare;
+                let authorizeEmail = cmdObj.authorizeEmail;
                 let authorizeSign = cmdObj.authorizeSign;
 
                 let optionsArray = [authorizeOpen, authorizeShare, authorizeSign];
@@ -608,6 +610,8 @@ program
                     commandOption = "re";
                 } else if (authorizeShare) {
                     commandOption = "sh";
+                } else if (authorizeEmail) {
+                    commandOption = "se";
                 } else if (authorizeSign) {
                     commandOption = "sg";
                 } else if (open) {
