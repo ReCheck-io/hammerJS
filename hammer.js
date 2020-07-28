@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+global.defaultGUIRequestId = 'ReCheckHAMMER';
 let recheck;
 try {
     recheck = require('../recheck-clientjs-library');
@@ -16,7 +17,6 @@ const atob = require('atob');
 
 let hammerNetwork = "ae";
 let hammerBaseUrl = "http://localhost:3000";
-// let hammerBaseUrl = "https://docs.recheck.io";
 
 recheck.debug(false);
 
