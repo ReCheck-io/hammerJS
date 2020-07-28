@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-global.defaultGUIRequestId = 'ReCheckHAMMER';
+global.defaultAPPRequestId = 'ReCheckHAMMER';
 let recheck;
 try {
     recheck = require('../recheck-clientjs-library');
