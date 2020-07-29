@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-global.defaultAPPRequestId = 'ReCheckHAMMER';
 let recheck;
 try {
     recheck = require('../recheck-clientjs-library');
@@ -19,7 +18,7 @@ let hammerNetwork = "ae";
 let hammerBaseUrl = "http://localhost:3000";
 
 recheck.debug(false);
-
+recheck.setDefaultRequestId('ReCheckHAMMER');
 recheck.init(hammerBaseUrl, hammerNetwork);
 
 
