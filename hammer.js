@@ -16,6 +16,7 @@ const atob = require('atob');
 
 let hammerNetwork = "ae";
 let hammerBaseUrl = "http://localhost:3000";
+const loginDevice = 'hammer-0.0.1';
 
 recheck.debug(false);
 recheck.setDefaultRequestId('ReCheckHAMMER');
@@ -85,7 +86,7 @@ async function requireAccountOption(fileName, password, login) {
     }
     try {
         if (login)
-            await recheck.login(loginAccount);
+            await recheck.login(loginAccount, 'notoken', loginDevice);
         return loginAccount;
     } catch (loginError) {
         console.log(loginError);
@@ -311,9 +312,9 @@ program
         try {
             let token;
             if (cmdObj.challenge) {
-                token = await recheck.loginWithChallenge(cmdObj.challenge, account);
+                token = await recheck.loginWithChallenge(cmdObj.challenge, account, 'notoken', loginDevice);
             } else {
-                token = await recheck.login(account);
+                token = await recheck.login(account, 'notoken', loginDevice);
             }
             console.log(token);
         } catch (error) {
