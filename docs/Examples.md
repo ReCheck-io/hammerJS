@@ -94,7 +94,7 @@ Example - _f47533d6-b7b1-4b00-b136-ed501897456b_ - the token needed for communic
 
 #### put - upload a file on the blockchain
 
-This command uploads the document on the blockchain. Keep in mind which blockchain network you are using. At the moment our service supports _Ethereum_ and _AEternity_. It is easy to distinguish them with _node hammer reveal_, as the aethernity adress and public sign key starts with ak_..., whereas the eth address starts with 0x...
+This command uploads the document on the blockchain. Keep in mind which blockchain network you are using. At the moment our service supports _Ethereum_ and _AEternity_. It is easy to distinguish them with _node hammer reveal_, as the aeternity address and public sign key starts with re_..., whereas the eth address starts with 0x...
 
 ```node hammer put <file> -i <yourKeysFile.re> -p <yourPassword>```
 

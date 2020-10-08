@@ -16,7 +16,7 @@ const atob = require('atob');
 
 let hammerNetwork = "ae";
 let hammerBaseUrl = "http://localhost:3000";
-const loginDevice = 'hammer-0.0.1';
+const loginDevice = 'hammer-0.2.0';
 
 recheck.debug(false);
 recheck.setDefaultRequestId('ReCheckHAMMER');
@@ -75,7 +75,7 @@ async function requireAccountOption(fileName, password, login) {
         let accountDecrypted = aes256.decrypt(password, accountEncrypted.binary);
         let account = JSON.parse(accountDecrypted);
         if (!account) process.exit(1);
-        if (!account.publicKey || !account.secretKey) {
+        if (!account.publicKey || !account.secretKey || !account.address) {
             console.error("Specified file does not provide public and secret keys.");
             process.exit(1);
         }
@@ -85,8 +85,9 @@ async function requireAccountOption(fileName, password, login) {
         process.exit(1);
     }
     try {
-        if (login)
+        if (login) {
             await recheck.login(loginAccount, 'notoken', loginDevice);
+        }
         return loginAccount;
     } catch (loginError) {
         console.log(loginError);
@@ -115,7 +116,7 @@ function manageReceipt(cmdObj, saveName, openResult) {
     }
 }
 
-program.version('0.1.0');
+program.version(loginDevice);
 
 program
     .option('-i, --identity-file <file>', 'specify identity file')

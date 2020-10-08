@@ -66,16 +66,16 @@ command -s --save-file
 
 To share a file you will need to provide the file's blockchain ID, and the user id of the user(s) you want to share it with. 
 
-```node hammer.js -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> share 0x..file'sId.. ak_..user'sID```
+```node hammer.js -u https://beta.recheck.io -i <yourKeysFile.re> -p <yourPassword> share 0x..file'sId.. re_..user'sID```
 
 _Example_
 
 ```
-node hammer.js -u https://beta.recheck.io -i test-users/user1-ae-123.re -p 123 share 0x41d58ed8cce4933acb55cf00c1ba5a4bb2b7047a96678ef168662cb379c55498 ak_2LLq3V4iWKipTEZfhAEEckv2H3nLfrn8WwhKkAt1UkFkt69AVh
+node hammer.js -u https://beta.recheck.io -i test-users/user1-ae-123.re -p 123 share 0x41d58ed8cce4933acb55cf00c1ba5a4bb2b7047a96678ef168662cb379c55498 re_2LLq3V4iWKipTEZfhAEEckv2H3nLfrn8WwhKkAt1UkFkt69AVh
 ```
 _returns_
 ```
-0x41d58ed8cce4933acb55cf00c1ba5a4bb2b7047a96678ef168662cb379c55498 -> ak_2LLq3V4iWKipTEZfhAEEckv2H3nLfrn8WwhKkAt1UkFkt69AVh OK
+0x41d58ed8cce4933acb55cf00c1ba5a4bb2b7047a96678ef168662cb379c55498 -> re_2LLq3V4iWKipTEZfhAEEckv2H3nLfrn8WwhKkAt1UkFkt69AVh OK
 ```
 
 ##### sign 
@@ -92,7 +92,7 @@ node hammer.js -u https://beta.recheck.io -i test-users/user1-ae-123.re -p 123 s
 _returns_
 ```
 { dataId: '0x41d58ed8cce4933acb55cf00c1ba5a4bb2b7047a96678ef168662cb379c55498',
-  userId: 'ak_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5' }
+  userId: 're_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5' }
 ```
 
 ##### share, open one or several files at once and sign a file with exec command
@@ -112,7 +112,7 @@ _returns_
 [ { dataId: '0xcf125467d079fb85562ced7fa1ad3456d08184492e82e13aacd8553af604aaf4',
     data: 
      { dataId: '0xcf125467d079fb85562ced7fa1ad3456d08184492e82e13aacd8553af604aaf4',
-       userId: 'ak_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5' } } ]
+       userId: 're_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5' } } ]
 ```
 ##### open - op:
 
@@ -126,7 +126,7 @@ This command will return the contents of the file as bytes to be reconstructed o
   { dataId: '0x9a3d7242d4b66d1a2533e1c17524a0dd1a3607d235b4500406efaa9150175f8d',
     data: 
      { dataId: '0x9a3d7242d4b66d1a2533e1c17524a0dd1a3607d235b4500406efaa9150175f8d',
-       ownerId: 'ak_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5',
+       ownerId: 're_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5',
        dataOriginalHash: '0x0f68807a5a86704ecdd6a2f84a8e0425b877b7688e7f2448685f306053ffa22d',
        dataName: 'Screenshot 2020-05-13 at 10.00.21',
        dataExtension: '.png',
@@ -134,7 +134,7 @@ This command will return the contents of the file as bytes to be reconstructed o
        dateUpdated: '2020-05-15T08:43:05.000Z',
        category: 'PERSONAL',
        keywords: 'test',
-       userId: 'ak_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5',
+       userId: 're_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5',
        payload: 'iVBORw0KGgoAAAANSUhEUgAAB4AAAAQ4CAYAAADo08FDAAAKw2lDQ1BJQ0MgUHJvZmlsZQAASImVlwdUU+kSgP970xstAQEpoYYivYOU0EPvzUZIAgklxoQgYlfEFVwLKiKgruiiiIKrUsSGWLAtCkqxbpBFRV0XC6Ci8i7w...,}
   }
 ]
@@ -152,7 +152,7 @@ _returns_
 [ { dataId: '0xcf125467d079fb85562ced7fa1ad3456d08184492e82e13aacd8553af604aaf4',
     data: 
      { dataId: '0xcf125467d079fb85562ced7fa1ad3456d08184492e82e13aacd8553af604aaf4',
-       userId: 'ak_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5',
+       userId: 're_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5',
        notification: 'notoken' } } ]
 ```
 ##### sign
@@ -167,7 +167,7 @@ _returns_
 [ { dataId: '0x1f4c0d873724a5017a15db3c20784da16c0585682bc42a0140f358619def6c22',
     data: 
      { dataId: '0x1f4c0d873724a5017a15db3c20784da16c0585682bc42a0140f358619def6c22',
-       userId: 'ak_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5' } } ]
+       userId: 're_ApGfbxjgRLrHzHsKXXmTrpX6h9QvRwTfC8GBKsD4ojBapKoE5' } } ]
 ```
 
 For more examples look at the documentation or click [here](docs/Examples.md).
