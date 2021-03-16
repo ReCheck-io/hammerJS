@@ -15,7 +15,7 @@ const btoa = require('btoa');
 const atob = require('atob');
 
 let hammerNetwork = "ae";
-let hammerBaseUrl = "http://localhost:3000";
+let hammerBaseUrl = "http://localhost:4000";
 const loginDevice = 'hammer-0.2.0';
 
 recheck.debug(false);
