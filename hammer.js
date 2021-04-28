@@ -323,59 +323,59 @@ program
         }
     });
 
-program
-    .command('put <file-name>')
-    .description('stores file securely and timestamps it')
-    .option('-x, --external <external-id>', 'register external id for file')
-    .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
-    .option('-t, --tx-poll', 'poll for tx receipt')
-    .action(async function (fileName, cmdObj) {
-        try {
-            processHostUrl(program.hostUrl);
-            let account = await requireAccountOption(program.identityFile, program.password, true);
-            requireFileName(fileName);
+// program
+//     .command('put <file-name>')
+//     .description('stores file securely and timestamps it')
+//     .option('-x, --external <external-id>', 'register external id for file')
+//     .option('-e, --extra <extra>', 'provide JSON.stringify([array of values]) for creation of trail hash')
+//     .option('-t, --tx-poll', 'poll for tx receipt')
+//     .action(async function (fileName, cmdObj) {
+//         try {
+//             processHostUrl(program.hostUrl);
+//             let account = await requireAccountOption(program.identityFile, program.password, true);
+//             requireFileName(fileName);
 
-            let file = await readBinaryFile(fileName);
-            let fileA = btoa(file.binary);
+//             let file = await readBinaryFile(fileName);
+//             let fileA = btoa(file.binary);
 
-            let nameExtensionObj = getFileNameAndExtension(file.name);
+//             let nameExtensionObj = getFileNameAndExtension(file.name);
 
-            let uploadResult = await recheck.store({
-                dataName: nameExtensionObj.dataName,
-                dataExtension: nameExtensionObj.dataExtension,
-                payload: fileA
-            }, account.address, account.publicEncKey, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
+//             let uploadResult = await recheck.store({
+//                 dataName: nameExtensionObj.dataName,
+//                 dataExtension: nameExtensionObj.dataExtension,
+//                 payload: fileA
+//             }, account.address, account.publicEncKey, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
 
-            if (isNullAny(uploadResult)) {
-                console.error("Error: status", uploadResult.status,
-                    "code", uploadResult.code, "message", uploadResult.message);
-            } else {
-                if (uploadResult.dataId) {
-                    console.log(`${file.name} ${uploadResult.dataId}`);
-                } else {
-                    // TODO - return the file id at the check case
-                    console.log(uploadResult);
-                }
-            }
-        } catch (error) {
-            console.error("Error: failed to upload file. Details:", error);
-        }
+//             if (isNullAny(uploadResult)) {
+//                 console.error("Error: status", uploadResult.status,
+//                     "code", uploadResult.code, "message", uploadResult.message);
+//             } else {
+//                 if (uploadResult.dataId) {
+//                     console.log(`${file.name} ${uploadResult.dataId}`);
+//                 } else {
+//                     // TODO - return the file id at the check case
+//                     console.log(uploadResult);
+//                 }
+//             }
+//         } catch (error) {
+//             console.error("Error: failed to upload file. Details:", error);
+//         }
 
-        function getFileNameAndExtension(fileName) {
-            let extension = '.unknown';
-            let extensionDotIndex = fileName.lastIndexOf('.');
+//         function getFileNameAndExtension(fileName) {
+//             let extension = '.unknown';
+//             let extensionDotIndex = fileName.lastIndexOf('.');
 
-            if (extensionDotIndex > 0) {
-                extension = fileName.substring(extensionDotIndex);
-                fileName = fileName.substring(0, extensionDotIndex);
-            }
+//             if (extensionDotIndex > 0) {
+//                 extension = fileName.substring(extensionDotIndex);
+//                 fileName = fileName.substring(0, extensionDotIndex);
+//             }
 
-            return {
-                dataName: fileName,
-                dataExtension: extension
-            };
-        }
-    });
+//             return {
+//                 dataName: fileName,
+//                 dataExtension: extension
+//             };
+//         }
+//     });
 
 program
     .command('get <file-id>')
