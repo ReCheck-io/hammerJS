@@ -24,7 +24,7 @@ To work on our test environment, you will have to remember to always put ```-u h
 ##### new blockchain identity
 Create your identity (account/wallet, containing your keys that connect you to the blockchain).
 
-```node hammer -u https://beta.recheck.io new <yourChosenIdentityFileName> -e <yourChosenPassword>```
+```node hammer new <yourChosenIdentityFileName> -e <yourChosenPassword>```
 
 This command will create a file, in the current folder, containing your identity. 
 
