@@ -14,7 +14,7 @@ const aes256 = require('aes256');
 const btoa = require('btoa');
 const atob = require('atob');
 
-let hammerNetwork = "ae";
+let hammerNetwork = "eth";
 let hammerBaseUrl = "http://localhost:4000";
 const loginDevice = 'hammer-0.2.0';
 
