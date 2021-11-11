@@ -6,7 +6,7 @@
   "main": "hammer.js",
   "license": "MIT",
   "dependencies": {
-    "recheck-clientjs-library": "1.0.23-beta.1"
+    "recheck-clientjs-library": "1.0.22-beta.5"
   },
   "directories": {
     "doc": "doc"
