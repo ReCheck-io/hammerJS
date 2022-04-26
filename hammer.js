@@ -14,7 +14,7 @@ const aes256 = require('aes256');
 const btoa = require('btoa');
 const atob = require('atob');
 
-let hammerNetwork = "eth";
+let hammerNetwork = "poly";//ae,eth,poly
 let hammerBaseUrl = "http://localhost:4000";
 const loginDevice = 'hammer-0.2.0';
 
@@ -212,7 +212,7 @@ program
             if (!publicKey) {
                 console.log("Public key not defined. Will use user specified identity.");
                 let account = await requireAccountOption(program.identityFile, program.password, false);
-                if (hammerNetwork === "eth") {
+                if (hammerNetwork === "eth" || hammerNetwork === "poly") {
                     publicKey = account.address;
                 } else {
                     publicKey = account.publicKey;
