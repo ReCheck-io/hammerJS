@@ -74,6 +74,7 @@ async function requireAccountOption(fileName, password, login) {
         let accountEncrypted = await readBinaryFile(fileName);
         let accountDecrypted = aes256.decrypt(password, accountEncrypted.binary);
         let account = JSON.parse(accountDecrypted);
+        console.log(111, account);
         if (!account) process.exit(1);
         if (!account.publicKey || !account.secretKey || !account.address) {
             console.error("Specified file does not provide public and secret keys.");
@@ -212,15 +213,11 @@ program
             if (!publicKey) {
                 console.log("Public key not defined. Will use user specified identity.");
                 let account = await requireAccountOption(program.identityFile, program.password, false);
-                if (hammerNetwork === "eth" || hammerNetwork === "poly") {
-                    publicKey = account.address;
-                } else {
-                    publicKey = account.publicKey;
-                }
+                publicKey = account.publicKey;
             }
             let pubKey = recheck.verifyMessage(message, signature, publicKey);
             if (pubKey === publicKey) {
-                console.log("Message is signed with public address", pubKey);
+                console.log("Message is signed with public key", pubKey);
             } else {
                 console.log("Provided signature does not match the public key for the provided message.");
             }
@@ -259,7 +256,7 @@ program
             if (bytesWritten < 1) {
                 throw new Error("Unable to write account data.");
             } else {
-                console.log("Account recovered", newAccount.publicKey);
+                console.log("Account recovered", newAccount.address);
             }
         } catch (error) {
             console.error(error);
@@ -392,8 +389,8 @@ program
         try {
             processHostUrl(program.hostUrl);
             let account = await requireAccountOption(program.identityFile, program.password, true);
-
-            let openResult = await recheck.open(fileId, account.publicKey, account, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
+            console.log(account);
+            let openResult = await recheck.open(fileId, account.address, account, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
 
             if (isNullAny(openResult)) {
                 console.error("Unable to decrypt or verify file");
@@ -431,11 +428,11 @@ program
             let account = await requireAccountOption(program.identityFile, program.password, true);
 
             let data = await readBinaryFile(fileName);
-            let validateResult = await recheck.validate(data.binary, account.publicKey, fileId, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
+            let validateResult = await recheck.validate(data.binary, account.address, fileId, cmdObj.external, cmdObj.txPoll, cmdObj.extra);
 
             if (validateResult.status !== "OK"
                 && validateResult.dataId === fileId
-                && validateResult.userId === account.publicKey) {
+                && validateResult.userId === account.address) {
                 console.log("OK");
             } else {
                 console.log("NOK");
