@@ -74,7 +74,7 @@ async function requireAccountOption(fileName, password, login) {
         let accountEncrypted = await readBinaryFile(fileName);
         let accountDecrypted = aes256.decrypt(password, accountEncrypted.binary);
         let account = JSON.parse(accountDecrypted);
-        console.log(111, account);
+
         if (!account) process.exit(1);
         if (!account.publicKey || !account.secretKey || !account.address) {
             console.error("Specified file does not provide public and secret keys.");
