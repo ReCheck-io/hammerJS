@@ -15,10 +15,10 @@ const btoa = require('btoa');
 const atob = require('atob');
 
 let hammerNetwork = "eth";
-let hammerBaseUrl = "http://localhost:4000";
+let hammerBaseUrl = "http://127.0.0.1:4000";
 const loginDevice = 'hammer-0.2.0';
 
-recheck.debug(false);
+recheck.debug(true);
 recheck.setDefaultRequestId('ReCheckHAMMER');
 recheck.init(hammerBaseUrl, hammerNetwork);
 
@@ -312,10 +312,17 @@ program
         let account = await requireAccountOption(program.identityFile, program.password, false);
         try {
             let token;
-            if (cmdObj.challenge) {
-                token = await recheck.loginWithChallenge(cmdObj.challenge, account, 'notoken', loginDevice);
+            if (cmdObj.challenge && cmdObj.challenge.includes(":")) {
+                const params = cmdObj.challenge.split(":");
+                if (params.length !== 2) {
+                    throw Error("Incorrect challenge params!");
+                }
+                const loginParams = { uuid: params[0], endTimestamp: params[1] };
+                const result = await recheck.loginWithChallengeParams(loginParams, account, 'notoken', loginDevice);
+                token = result.token;
             } else {
-                token = await recheck.login(account, 'notoken', loginDevice);
+                const result = await recheck.login(account, 'notoken', loginDevice);
+                token = result.token;
             }
             console.log(token);
         } catch (error) {
